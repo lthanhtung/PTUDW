@@ -77,3 +77,10 @@ D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\obj\Debug\ProjectBanHang.csproj.Cor
 D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\obj\Debug\ProjectBanHang.csproj.CopyComplete
 D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\obj\Debug\ProjectBanHang.dll
 D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\obj\Debug\ProjectBanHang.pdb
+D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\bin\EntityFramework.dll
+D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\bin\EntityFramework.SqlServer.dll
+D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\bin\EntityFramework.xml
+D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\bin\EntityFramework.SqlServer.xml
+D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\bin\Myclass.dll
+D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\bin\Myclass.pdb
+D:\PTUDW\PTUDW\ProjectBanHang\ProjectBanHang\bin\Myclass.dll.config

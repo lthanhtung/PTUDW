@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Myclass.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -11,6 +12,9 @@ namespace ProjectBanHang.Controllers
         // GET: Site
         public ActionResult Index()
         {
+            MyDBContext db = new MyDBContext();
+            int Sodong = db.Products.Count();
+            ViewBag.dong = Sodong;
             return View();
         }
     }
