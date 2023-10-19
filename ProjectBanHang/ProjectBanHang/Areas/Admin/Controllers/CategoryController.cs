@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using Myclass.DAO;
 using Myclass.Model;
+using ProjectBanHang.Library;
 
 namespace ProjectBanHang.Areas.Admin.Controllers
 {
@@ -46,6 +47,9 @@ namespace ProjectBanHang.Areas.Admin.Controllers
         // GET: Admin/Category/Create
         public ActionResult Create()
         {
+            ViewBag.ListCat = new SelectList(categoriesDAO.getList("Index"), "Id", "Name");
+            ViewBag.ListOrder = new SelectList(categoriesDAO.getList("Index"), "Order", "Name");
+
             return View();
         }
 
@@ -56,6 +60,30 @@ namespace ProjectBanHang.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                //Xử lý tự động: CreateAt
+                catelogies.CreateAt = DateTime.Now;
+                //Xử lý tự động: UpdateAt
+                catelogies.UpdateAt = DateTime.Now;
+                //Xử lý tự động: ParentID
+                if (catelogies.ParentId == null)
+                {
+                    catelogies.ParentId = 0;
+                }
+                //Xử lý tự động: Order
+                if (catelogies.Order == null)
+                {
+                    catelogies.Order = 1;
+                }
+                else
+                {
+                    catelogies.Order += 1;
+                }
+                //Xử lý tự động: Slug
+                catelogies.Slug = XString.Str_Slug(catelogies.Name);
+
+
+
+                //Chèn thêm dòng cho database
                 categoriesDAO.Insert(catelogies);
                 return RedirectToAction("Index");
             }
@@ -120,5 +148,31 @@ namespace ProjectBanHang.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        /// ///////////////////////////////////////////////////
+        /// Thùng rác - Trash
+        // GET: Admin/Category/Status/5
+        public ActionResult Status(int? id)
+        {
+            if (id == null)
+            {
+                //Thông báo cập nhập trạng thái thất bại
+
+                TempData["message"] = new XMessage("danger", "Cập nhập trạng thái thất bại");
+                return RedirectToAction("Index");
+            }
+            //Truy vấn id
+            Catelogies catelogies = categoriesDAO.getRow(id);
+            //chuyển đổi trạng thái của Status 1<->2
+            catelogies.Status = (catelogies.Status == 1) ? 2 :1;
+            //Cập nhập trạng thái
+            catelogies.UpdateAt = DateTime.Now;             
+            //cập nhập lại database
+            categoriesDAO.Update(catelogies);
+
+            //Thông báo cập nhập trạng thái thành công
+            TempData["message"] = TempData["message"] = new XMessage("danger", "Cập nhập trạng thái thành công");
+            return RedirectToAction("Index");
+
+        }
     }
 }
