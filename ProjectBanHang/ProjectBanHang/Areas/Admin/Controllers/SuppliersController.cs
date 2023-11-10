@@ -88,7 +88,7 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 //xu ly cho phan upload hình ảnh
                 var img = Request.Files["img"];//upload hinh
                  string PathDir = "~/Public/img/Suppuliers";//cập nhập hình
-                if (img.ContentLength != 0)
+                if (img != null && img.ContentLength != 0)
                 {
                     string[] FileExtentions = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
                     //kiem tra tap tin co hay khong
@@ -98,18 +98,19 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                         //ten file = Slug + phan mo rong cua tap tin
                         string imgName = slug + suppliers.Id + img.FileName.Substring(img.FileName.LastIndexOf("."));
                         suppliers.Image = imgName;
-                       
+
                         string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
                         img.SaveAs(PathFile);
                     }
+                    //(phần này nằm ở edit thực hiện chức năng cập nhập lại hình ảnh
 
                     ////xử lý cho mục xóa hình ảnh
                     //if (suppliers.Image != null)
-                    //{                    
+                    //{
                     //    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Image);
                     //    System.IO.File.Delete(DelPath);
                     //}
-
+                //)
 
                 }//ket thuc phan upload hinh anh
 
@@ -164,7 +165,7 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 //Xử lý tự động: UpdateAt
                 suppliers.UpdateAt = DateTime.Now;
                 //Xử lý tự động: Order
-                if (suppliers.Order == null)
+                if ( suppliers.Order == null)
                 {
                     suppliers.Order = 1;
                 }
@@ -174,6 +175,35 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 }
                 //Xử lý tự động: Slug
                 suppliers.Slug = XString.Str_Slug(suppliers.Name);
+
+                //Trước khi cập nhập hình ảnh thì xóa ảnh cũ
+                var img = Request.Files["img"];//upload hinh
+                string PathDir = "~/Public/img/Suppuliers";//cập nhập hình
+                //xử lý xóa ảnh cũ
+                if (img.ContentLength != 0 && suppliers.Image != null)//tồn tại 1 logo của NCC từ trước
+                {
+                    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Image);
+                    System.IO.File.Delete(DelPath);
+                }
+                //Cập nhập ảnh mới của Nhà cung cấp
+                //xu ly cho phan upload hình ảnh
+
+                if (img != null && img.ContentLength != 0)
+                {
+                    string[] FileExtentions = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
+                    //kiem tra tap tin co hay khong
+                    if (FileExtentions.Contains(img.FileName.Substring(img.FileName.LastIndexOf("."))))//lay phan mo rong cua tap tin
+                    {
+                        string slug = suppliers.Slug;
+                        //ten file = Slug + phan mo rong cua tap tin
+                        string imgName = slug + suppliers.Id + img.FileName.Substring(img.FileName.LastIndexOf("."));
+                        suppliers.Image = imgName;
+
+                        string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
+                        img.SaveAs(PathFile);
+                    }
+                                        
+                }//ket thuc phan upload hinh anh
 
 
                 //cập nhập mãu tin vào database
