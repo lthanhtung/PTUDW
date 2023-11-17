@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity;
-using System.EnterpriseServices.Internal;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices.ComTypes;
 using System.Web;
 using System.Web.Mvc;
 using Myclass.DAO;
@@ -15,14 +13,16 @@ using ProjectBanHang.Library;
 
 namespace ProjectBanHang.Areas.Admin.Controllers
 {
-    public class SuppliersController : Controller
+    public class ProductController : Controller
     {
+        ProductDAO productDAO = new ProductDAO();
+        CategoriesDAO categoriesDAO = new CategoriesDAO();
         SuppliersDAO suppliersDAO = new SuppliersDAO();
-        // GET: Admin/Suppliers
+        // GET: Admin/product/index
         //Index
         public ActionResult Index()
         {
-            return View(suppliersDAO.getList("Index"));
+            return View(productDAO.getList("Index"));
         }
 
         // GET: Admin/Suppliers/Details/5
@@ -35,8 +35,8 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
                 return RedirectToAction("Index");
             }
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productDAO.getRow(id);
+            if (products == null)
             {
                 //thông báo thất bại
 
@@ -44,13 +44,17 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 return RedirectToAction("Index");
 
             }
-            return View(suppliers);
+            return View(products);
         }
         ///////
         // GET: Admin/Suppliers/Create
         public ActionResult Create()
         {
-            ViewBag.ListOrder = new SelectList(suppliersDAO.getList("Index"), "Order", "Name");
+            ViewBag.ListCatId = new SelectList(categoriesDAO.getList("Index"), "Id", "Name");//sai CatID - truy van tu bang catelogi
+
+            ViewBag.ListSupID = new SelectList(suppliersDAO.getList("Index"), "Id", "Name"); // sai Suplier - truy van bang suplier
+            //dung de lua chon danh sach droplist nhu bang catelogies: parentId va Supplier: ParentID
+
 
             return View();
         }
@@ -58,46 +62,38 @@ namespace ProjectBanHang.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(Suppliers suppliers)
+        public ActionResult Create(Products product)
         {
             if (ModelState.IsValid)
             {
                 //xử lý tự động slug,createAt,BY, updateAt,BY,Order
 
                 //Xử lý tự động: CreateAt
-                suppliers.CreateAt = DateTime.Now;
+                product.CreateAt = DateTime.Now;
                 //Xử lý tự động: UpdateAt
-                suppliers.UpdateAt = DateTime.Now;
+                product.UpdateAt = DateTime.Now;
 
-                suppliers.CreateBy = Convert.ToInt32(Session["UserId"]);
+                product.CreateBy = Convert.ToInt32(Session["UserId"]);
 
-                suppliers.UpdateBy = Convert.ToInt32(Session["UserId"]);
+                product.UpdateBy = Convert.ToInt32(Session["UserId"]);
 
-                //Xử lý tự động: Order
-                if (suppliers.Order == null)
-                {
-                    suppliers.Order = 1;
-                }
-                else
-                {
-                    suppliers.Order += 1;
-                }
+               
                 //Xử lý tự động: Slug
-                suppliers.Slug = XString.Str_Slug(suppliers.Name);
+                product.Slug = XString.Str_Slug(product.Name);
 
                 //xu ly cho phan upload hình ảnh
                 var img = Request.Files["img"];//upload hinh
-                 string PathDir = "~/Public/img/Suppuliers";//cập nhập hình
+                string PathDir = "~/Public/img/product";//cập nhập hình
                 if (img != null && img.ContentLength != 0)
                 {
                     string[] FileExtentions = new string[] { ".jpg", ".jpeg", ".png", ".gif" };
                     //kiem tra tap tin co hay khong
                     if (FileExtentions.Contains(img.FileName.Substring(img.FileName.LastIndexOf("."))))//lay phan mo rong cua tap tin
                     {
-                        string slug = suppliers.Slug;
+                        string slug = product.Slug;
                         //ten file = Slug + phan mo rong cua tap tin
-                        string imgName = slug  + img.FileName.Substring(img.FileName.LastIndexOf("."));
-                        suppliers.Image = imgName;
+                        string imgName = slug + img.FileName.Substring(img.FileName.LastIndexOf("."));
+                        product.Image = imgName;
 
                         string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
                         img.SaveAs(PathFile);
@@ -110,7 +106,7 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                     //    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Image);
                     //    System.IO.File.Delete(DelPath);
                     //}
-                //)
+                    //)
 
                 }//ket thuc phan upload hinh anh
 
@@ -118,14 +114,16 @@ namespace ProjectBanHang.Areas.Admin.Controllers
 
 
                 //chèn mẫu tin vào database;
-                suppliersDAO.Insert(suppliers);
+                productDAO.Insert(product);
                 //thông báo mẫu tin thành công
-                TempData["message"] = new XMessage("success", "Tạo mới nhà cung cấp thành công");
+                TempData["message"] = new XMessage("success", "Tạo mới sản phẩm thành công");
                 return RedirectToAction("Index");
 
             }
+            ViewBag.ListCatId = new SelectList(categoriesDAO.getList("Index"), "Id", "Name");//sai CatID - truy van tu bang catelogi
 
-            return View(suppliers);
+            ViewBag.ListSupID = new SelectList(suppliersDAO.getList("Index"), "Id", "Name"); // sai Suplier - truy van bang suplier
+            return View(product);
         }
 
         // GET: Admin/Suppliers/Edit/5
@@ -136,26 +134,26 @@ namespace ProjectBanHang.Areas.Admin.Controllers
 
                 //thông báo thất bại
 
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products product = productDAO.getRow(id);
+            if (product == null)
             {
 
                 //thông báo thất bại
 
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            ViewBag.ListOrder = new SelectList(suppliersDAO.getList("Index"), "Order", "Name");
+            ViewBag.ListOrder = new SelectList(productDAO.getList("Index"), "Order", "Name");
 
-            return View(suppliers);
+            return View(product);
         }
         // POST: Admin/Suppliers/Edit/5       
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(Suppliers suppliers)
+        public ActionResult Edit(Products products)
         {
             if (ModelState.IsValid)
             {
@@ -163,26 +161,18 @@ namespace ProjectBanHang.Areas.Admin.Controllers
 
 
                 //Xử lý tự động: UpdateAt
-                suppliers.UpdateAt = DateTime.Now;
-                //Xử lý tự động: Order
-                if ( suppliers.Order == null)
-                {
-                    suppliers.Order = 1;
-                }
-                else
-                {
-                    suppliers.Order += 1;
-                }
+                products.UpdateAt = DateTime.Now;
+              
                 //Xử lý tự động: Slug
-                suppliers.Slug = XString.Str_Slug(suppliers.Name);
+                products.Slug = XString.Str_Slug(products.Name);
 
                 //Trước khi cập nhập hình ảnh thì xóa ảnh cũ
                 var img = Request.Files["img"];//upload hinh
-                string PathDir = "~/Public/img/Suppuliers";//cập nhập hình
+                string PathDir = "~/Public/img/product";//cập nhập hình
                 //xử lý xóa ảnh cũ
-                if (img.ContentLength != 0 && suppliers.Image != null)//tồn tại 1 logo của NCC từ trước
+                if (img.ContentLength != 0 && products.Image != null)//tồn tại 1 logo của NCC từ trước
                 {
-                    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Image);
+                    string DelPath = Path.Combine(Server.MapPath(PathDir), products.Image);
                     System.IO.File.Delete(DelPath);
                 }
                 //Cập nhập ảnh mới của Nhà cung cấp
@@ -194,27 +184,27 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                     //kiem tra tap tin co hay khong
                     if (FileExtentions.Contains(img.FileName.Substring(img.FileName.LastIndexOf("."))))//lay phan mo rong cua tap tin
                     {
-                        string slug = suppliers.Slug;
+                        string slug = products.Slug;
                         //ten file = Slug + phan mo rong cua tap tin
-                        string imgName = slug  + img.FileName.Substring(img.FileName.LastIndexOf("."));
-                        suppliers.Image = imgName;
+                        string imgName = slug + img.FileName.Substring(img.FileName.LastIndexOf("."));
+                        products.Image = imgName;
 
                         string PathFile = Path.Combine(Server.MapPath(PathDir), imgName);
                         img.SaveAs(PathFile);
                     }
-                                        
+
                 }//ket thuc phan upload hinh anh
 
 
                 //cập nhập mãu tin vào database
-                suppliersDAO.Update(suppliers);
+                productDAO.Update(products);
                 //thông báo mẫu tin thành công
-                TempData["message"] = new XMessage("success", "cập nhập nhà cung cấp thành công");
+                TempData["message"] = new XMessage("success", "cập nhập sản phẩm thành công");
                 return RedirectToAction("Index");
             }
-            ViewBag.ListOrder = new SelectList(suppliersDAO.getList("Index"), "Order", "Name");
+          //  ViewBag.ListOrder = new SelectList(productDAO.getList("Index"), "Order", "Name");
 
-            return View(suppliers);
+            return View(products);
         }
 
         // GET: Admin/Suppliers/Delete/5
@@ -222,46 +212,31 @@ namespace ProjectBanHang.Areas.Admin.Controllers
         {
             if (id == null)
             {
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products product = productDAO.getRow(id);
+            if (product == null)
             {
                 //thông báo thất bại
-                TempData["message"] = new XMessage("danger", "Không tồn tại nhà cung cấp");
+                TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            return View(suppliers);
+            return View(product);
         }
 
-        // POST: Admin/Suppliers/Delete/5
+        // POST: Admin/Product/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            //xử lý phần hình ảnh
-            var img = Request.Files["img"];//upload hinh
-            string PathDir = "~/Public/img/Suppuliers";//cập nhập hình
-        //xóa mãu tin ra khỏi database
-            if (suppliersDAO.Delete(suppliers) == 1)
-            {
+            Products product = productDAO.getRow(id);
+            productDAO.Delete(product);
+            
+             //xóa mẫu tin thành công
+            TempData["message"] = new XMessage("success", "Xóa sản phẩm thành công");
 
-                //xử lý xóa hình ảnh
-                if (suppliers.Image != null)//tồn tại 1 logo của NCC từ trước
-                {
-                    string DelPath = Path.Combine(Server.MapPath(PathDir), suppliers.Image);
-                    System.IO.File.Delete(DelPath);
-
-                }
-            }
-          
-         
-            //xóa mẫu tin thành công
-            TempData["message"] = new XMessage("success", "Xóa nhà cung cấp thành công");
-
-            return RedirectToAction("Index");
+            return RedirectToAction("Trash");
         }
 
         //phát sinh thêm hàm mới: status, Trash,deltrash,undo
@@ -279,8 +254,8 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             //Truy vấn id
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products products = productDAO.getRow(id);
+            if (products == null)
             {
                 //Thông báo cập nhập trạng thái thất bại
 
@@ -292,11 +267,11 @@ namespace ProjectBanHang.Areas.Admin.Controllers
 
 
                 //chuyển đổi trạng thái của Status 1<->2
-                suppliers.Status = (suppliers.Status == 1) ? 2 : 1;
+                products.Status = (products.Status == 1) ? 2 : 1;
                 //Cập nhập trạng thái
-                suppliers.UpdateAt = DateTime.Now;
+                products.UpdateAt = DateTime.Now;
                 //cập nhập lại database
-                suppliersDAO.Update(suppliers);
+                productDAO.Update(products);
 
                 //Thông báo cập nhập trạng thái thành công
                 TempData["message"] = TempData["message"] = new XMessage("success", "Cập nhập trạng thái thành công");
@@ -316,8 +291,8 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             //Truy vấn id
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products product = productDAO.getRow(id);
+            if (product == null)
             {
                 //Thông báo cập nhập trạng thái thất bại
 
@@ -329,11 +304,11 @@ namespace ProjectBanHang.Areas.Admin.Controllers
 
 
                 //chuyển đổi trạng thái của Status 1,2<->0 : khong hieu thi o index
-                suppliers.Status = 0;
+                product.Status = 0;
                 //Cập nhập trạng thái
-                suppliers.UpdateAt = DateTime.Now;
+                product.UpdateAt = DateTime.Now;
                 //cập nhập lại database
-                suppliersDAO.Update(suppliers);
+                productDAO.Update(product);
 
                 //Thông báo cập nhập trạng thái thành công
                 TempData["message"] = TempData["message"] = new XMessage("success", "Xóa mẫu tin thành công");
@@ -345,7 +320,7 @@ namespace ProjectBanHang.Areas.Admin.Controllers
         // GET: Admin/Category/Recover
         public ActionResult Trash()
         {
-            return View(suppliersDAO.getList("Trash"));
+            return View(productDAO.getList("Trash"));
         }
         //Recover
         // GET: Admin/Category/Recover/5
@@ -360,8 +335,8 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 return RedirectToAction("Index");
             }
             //Truy vấn id
-            Suppliers suppliers = suppliersDAO.getRow(id);
-            if (suppliers == null)
+            Products product = productDAO.getRow(id);
+            if (product == null)
             {
                 //Thông báo cập nhập trạng thái thất bại
 
@@ -373,11 +348,11 @@ namespace ProjectBanHang.Areas.Admin.Controllers
 
 
                 //chuyển đổi trạng thái của Status 0-> 2: không xuất bản
-                suppliers.Status = 2;
+                product.Status = 2;
                 //Cập nhập trạng thái
-                suppliers.UpdateAt = DateTime.Now;
+                product.UpdateAt = DateTime.Now;
                 //cập nhập lại database
-                suppliersDAO.Update(suppliers);
+                productDAO.Update(product);
 
                 //Thông báo phục hồi mẫu tin thành công
                 TempData["message"] = TempData["message"] = new XMessage("success", "Phục hồi mẫu tin thành công");

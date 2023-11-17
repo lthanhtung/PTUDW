@@ -8,39 +8,36 @@ using System.Threading.Tasks;
 
 namespace Myclass.DAO
 {
-    public class SuppliersDAO
+    public class ProductDAO
     {
-        //Copy nội dung của class categri , thay the categories thành Suppliers
-
-       
         private MyDBContext db = new MyDBContext();
 
         //SELECT * FROM ...
 
-        public List<Suppliers> getList()
+        public List<Products> getList()
         {
-            return db.Suppliers.ToList();
+            return db.Products.ToList();
         }
         //cho index chi voi Status 1,2
         //Select * From ...
-        public List<Suppliers> getList(string status = "ALL")//status 0,1,2
+        public List<Products> getList(string status = "ALL")//status 0,1,2
         {
-            List<Suppliers> list = null;
+            List<Products> list = null;
             switch (status)
             {
                 case "Index": //1,2
                     {
-                        list = db.Suppliers.Where(m => m.Status != 0).ToList();
+                        list = db.Products.Where(m => m.Status != 0).ToList();
                         break;
                     }
                 case "Trash": //0
                     {
-                        list = db.Suppliers.Where(m => m.Status == 0).ToList();
+                        list = db.Products.Where(m => m.Status == 0).ToList();
                         break;
                     }
                 default:
                     {
-                        list = db.Suppliers.ToList();
+                        list = db.Products.ToList();
                         break;
                     }
 
@@ -49,7 +46,7 @@ namespace Myclass.DAO
         }
 
         //Details
-        public Suppliers getRow(int? id)
+        public Products getRow(int? id)
         {
             if (id == null)
             {
@@ -57,30 +54,30 @@ namespace Myclass.DAO
             }
             else
             {
-                return db.Suppliers.Find(id);
+                return db.Products.Find(id);
 
             }
 
         }
 
         //Tạo mới mẫu tin
-        public int Insert(Suppliers row)
+        public int Insert(Products row)
         {
-            db.Suppliers.Add(row);
+            db.Products.Add(row);
             return db.SaveChanges();
         }
 
         //Cập nhập mẫu tin
-        public int Update(Suppliers row)
+        public int Update(Products row)
         {
             db.Entry(row).State = EntityState.Modified;
             return db.SaveChanges();
         }
         //Xóa mẫu tin
-        public int Delete(Suppliers row)
+        public int Delete(Products row)
         {
-            db.Suppliers.Remove(row);
-            return db.SaveChanges();//thành công => return 1
+            db.Products.Remove(row);
+            return db.SaveChanges();
         }
     }
 }
