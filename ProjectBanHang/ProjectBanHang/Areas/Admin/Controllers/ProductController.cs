@@ -146,7 +146,9 @@ namespace ProjectBanHang.Areas.Admin.Controllers
                 TempData["message"] = new XMessage("danger", "Không tồn tại sản phẩm");
                 return RedirectToAction("Index");
             }
-            ViewBag.ListOrder = new SelectList(productDAO.getList("Index"), "Order", "Name");
+            ViewBag.ListCatId = new SelectList(categoriesDAO.getList("Index"), "Id", "Name");//sai CatID - truy van tu bang catelogi
+
+            ViewBag.ListSupID = new SelectList(suppliersDAO.getList("Index"), "Id", "Name"); // sai Suplier - truy van bang suplier
 
             return View(product);
         }
