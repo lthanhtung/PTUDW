@@ -14,7 +14,7 @@ namespace Myclass.Model
         [Key]
         public int Id { get; set; }
         [Required(ErrorMessage = "MÃ loại sản phẩm không để trống")]
-        [Display(Name = "Mã loại sản phẩm")]
+        [Display(Name = "Mã sản phẩm")]
         public int CatId { get; set; }
         [Required(ErrorMessage = "Tên sản phẩm không để trống")]
         [Display(Name = "Tên sản phẩm")]

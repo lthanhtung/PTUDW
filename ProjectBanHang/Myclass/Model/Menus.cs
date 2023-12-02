@@ -54,7 +54,7 @@ namespace Myclass.Model
 
         [Display(Name = "Trạng thái")]
         [Required(ErrorMessage = "Trạng thái không để trống")]
-        public int Status { get; set; }
+        public int? Status { get; set; }
 
     }
 }

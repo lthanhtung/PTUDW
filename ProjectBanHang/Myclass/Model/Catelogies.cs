@@ -28,7 +28,7 @@ namespace Myclass.Model
         [Required(ErrorMessage = "Từ khóa  không để trống")]
         [Display(Name = "Từ khóa")]
         public String MetaKey { get; set; }
-        [Display(Name = "Tạo bởi")]
+        [Display(Name = "Người Tạo")]
         [Required(ErrorMessage = "Người tạo không để trống")]
 
         public int CreateBy { get; set; }
@@ -36,7 +36,7 @@ namespace Myclass.Model
         [Required(ErrorMessage = "Ngày tạo không để trống")]
 
         public DateTime CreateAt { get; set; }
-        [Display(Name = "Cập nhập bởi")]
+        [Display(Name = "Người Cập nhập")]
         [Required(ErrorMessage = "Người cập nhập không để trống")]
 
         public int UpdateBy { get; set; }
