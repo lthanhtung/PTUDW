@@ -18,9 +18,7 @@ namespace Myclass.Model
         public string Title { get; set; }
         public string Slud { get; set; }
         public string Detail { get; set; }
-        
         public string Image { get; set; }
-        
         public string MetaKey { get; set; }
         public string MetaDesc { get; set; }
         public int CreateBy { get; set; }

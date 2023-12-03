@@ -239,11 +239,9 @@ namespace ProjectBanHang.Areas.Admin.Controllers
         }
 
         // POST: Admin/Menu/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "Id,Name,TableID,TypeMenu,Position,Link,ParentID,Order,CreateAt,CreateBy,UpdateAt,UpdateBy,Status")] Menus menus)
+        public ActionResult Create(Menus menus)
         {
             if (ModelState.IsValid)
             {
@@ -274,7 +272,7 @@ namespace ProjectBanHang.Areas.Admin.Controllers
         // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,Name,TableID,TypeMenu,Position,Link,ParentID,Order,CreateAt,CreateBy,UpdateAt,UpdateBy,Status")] Menus menus)
+        public ActionResult Edit(Menus menus)
         {
             if (ModelState.IsValid)
             {
